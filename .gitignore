@@ -19,3 +19,7 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+# テンプレートのファイルをgitの管理対象外とする
+node_modules
+articles/template
