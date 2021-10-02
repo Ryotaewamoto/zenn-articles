@@ -1,3 +1,3 @@
 # zenn-articles
-Zenn
-test
+
+:book: https://zenn.dev/ryota_iwamoto
