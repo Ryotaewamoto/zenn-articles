@@ -1,0 +1,23 @@
+{
+  "name": "zenn-articles",
+  "version": "1.0.0",
+  "description": ":book: https://zenn.dev/ryota_iwamoto",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ryotaewamoto/zenn-articles.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ryotaewamoto/zenn-articles/issues"
+  },
+  "homepage": "https://github.com/Ryotaewamoto/zenn-articles#readme",
+  "dependencies": {
+    "zenn-cli": "^0.1.98"
+  }
+}
