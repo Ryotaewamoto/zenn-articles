@@ -53,7 +53,7 @@ class FirstPage extends StatelessWidget {
 
 この場合、NextPageでブラウザバックボタンが押されるとFirstPageに画面遷移します。
 
-WillPopScope ウィジェットないのonWillpop を変更することで、バックブラウザボタンが押された時の処理を変えることができます。
+WillPopScope ウィジェット内のonWillpop を変更することで、バックブラウザボタンが押された時の処理を変えることができます。
 
 # まとめ
 
