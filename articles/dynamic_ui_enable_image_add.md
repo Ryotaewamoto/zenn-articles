@@ -305,7 +305,7 @@ class ImageRoundedCard extends StatelessWidget {
 
 ## step.4 modelの作成
 
-最後にfirst_pageのもmodelの部分を書いていきます。
+最後にfirst_pageのmodel部分を書いていきます。
 
 非同期処理があるので、isLoadingという変数を用意して``init()``が行われているときはloading中の状態にしてます。
 
