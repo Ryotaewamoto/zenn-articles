@@ -9,7 +9,7 @@ published: true
 # はじめに
 ご覧いただきありがとうございます。ganです。
 
-今回は、動的に画像を追加できるUIを作る機会があったのでそれをまとめておきます。またFirebaseのfirestoreとstrorageを使用してデータのアップロードと保存することもやっていきます。
+今回は、動的に画像を追加できるUIを作る機会があったのでそれをまとめておきます。またFirebase Firestoreとstorageを使用してデータのアップロードと保存することもやっていきます。
 
 
 以下の記事をかなり参考にしたので合わせて読んでおくと理解しやすいかもです。
@@ -32,7 +32,7 @@ Flutter web
 Firebase
 （packageは、provider, firebaseを使います。）
 
-pubspeck.yamlは以下の状態です。
+pubspec.yamlは以下の状態です。
 必要に応じて追加してください。
 
 ```yaml
@@ -107,11 +107,11 @@ class FavoriteImage {
 
 つぎにリポジトリを作成していきます。
 
-ここでは、``favorite_image_repositrory``と``storage_repository``の2つ作ります。
+ここでは、``favorite_image_repository``と``storage_repository``の2つ作ります。
 
 ### favorite_image_repositoryの作成
 
-``favorite_image_repositrory``の方はFirestoreに画像を追加する、またFiresstoreから画像を読み取る処理を書いていきます。
+``favorite_image_repository``の方はFirestoreに画像を追加する、またFirestoreから画像を読み取る処理を書いていきます。
 
 画像のデータをFirestoreから取ってくる際に追加順にしたいのでorderByを使用しています。
 
@@ -199,7 +199,7 @@ class StorageRepository {
 
 ### 補足
 
-ファイルの名前に``first``とは言っていますが、secon以降の画面はないです。ミスリードに繋がりやすいと思ったので補足しておきます。
+ファイルの名前に``first``とは言っていますが、second以降の画面はないです。ミスリードに繋がりやすいと思ったので補足しておきます。
 
 
 ```dart:first_page.dart
@@ -307,7 +307,7 @@ class ImageRoundedCard extends StatelessWidget {
 
 最後にfirst_pageのもmodelの部分を書いていきます。
 
-非同期処理があるので、isloadingという変数を用意して``init()``が行われているときはloading中の状態にしてます。
+非同期処理があるので、isLoadingという変数を用意して``init()``が行われているときはloading中の状態にしてます。
 
 
 
@@ -408,7 +408,6 @@ class FirstModel extends ChangeNotifier {
 
 # まとめ
 
+今回は部分的なことよりも具体的なコード多めで、実際に使えることを意識しました！
+
 Flutterはまだまだ勉強中なので間違ってるところやアドバイス等があればコメントお願いします！！
-
-
-(記事を書いていて、コードをバーーーン貼り付ける作業が多くなってしまった、、、次からは中のコードの解説ももうすこしできたらいいな〜（筆者の反省)
