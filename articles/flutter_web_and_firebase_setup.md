@@ -2,7 +2,7 @@
 title: "[Flutter Web] [Firebase] [2021/10/09時点] Flutter Web に Firebase を追加" # 記事のタイトル
 emoji: "👶" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["Flutter", "FlutterWeb", "Firebase"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
+topics: ["Flutter", "Web", "Firebase"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
 published: true # 公開設定（falseにすると下書き）
 ---
 

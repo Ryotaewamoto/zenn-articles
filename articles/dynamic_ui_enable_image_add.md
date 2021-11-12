@@ -2,7 +2,7 @@
 title: "【Flutter】よくある動的に画像を追加できるUIを作成"
 emoji: "🍣"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["Flutter", FlutterWeb, Firebase]
+topics: ["Flutter", Web, Firebase]
 published: true
 ---
 
