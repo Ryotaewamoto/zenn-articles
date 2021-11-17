@@ -1,5 +1,5 @@
 ---
-title: "【初心者向け】Dev Tools を使いこなそう" # 記事のタイトル
+title: "【Flutter】【初心者向け】Dev Tools を使いこなそう" # 記事のタイトル
 emoji: "🧸" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
@@ -11,7 +11,7 @@ published: false # 公開設定（falseにすると下書き）
 
 今回はFlutter を使うなら欠かせない『Dev Tools』について書いていきます。自分は最近使い始めたのですが、もうこれがないと生きていけません。（それくらい便利です！）
 
-なるべく詳しく書くのでぜひ使ってみてください！！
+なるべく画像多めで詳しく書いたのでぜひ使ってみてください！！
 
 
 # Dev Tools とは？
@@ -20,7 +20,7 @@ published: false # 公開設定（falseにすると下書き）
 
 Dev Tools というのはFlutter やDart を使って開発をする人向けのもので、アプリのレイアウト検証(layout inspection)やパフォーマンス(performance), メモリ、またデバッグなどを効率よくとこなうためのWebアプリケーションツールです。
 
-かなり便利な機能がいくつもありますが、今回はレイアウト検証(layout inspection)について重点的に解説します。
+かなり便利な機能がいくつもありますが、今回はレイアウト検証(layout inspection)とパフォーマンス(performance)について重点的に解説します。
 
 
 参考動画
@@ -41,28 +41,11 @@ https://docs.flutter.dev/development/tools/devtools/vscode
 
 # 使い方
 
-## 起動方法
-
-これはとても簡単でツールウィンドウのDebug を選択します。
-開いたらConsole と書いてある行の右端にあるDart のアイコンをクリックします。
-するとブラウザでDev Tools が起動します。
-
-![](https://storage.googleapis.com/zenn-user-upload/915aaf94138e-20211117.png)
-
-クリックすると、
-
-![](https://storage.googleapis.com/zenn-user-upload/05d065fdc795-20211117.png)
-
-この画面が現れます。
-ここまできたら準備完了です。
-
-## 機能.1 Flutter Inspector
-
-これから実際にDev Tools を使っていこうと思います。
+## サンプルコード
 
 サンプルとして以下のようなアプリを使用します。
 
-![](https://storage.googleapis.com/zenn-user-upload/eaf0badfa9d1-20211117.png)
+![](https://storage.googleapis.com/zenn-user-upload/c3f2eef4a827-20211117.png)
 
 コード
 ```dart
@@ -125,19 +108,88 @@ class MyHomePage extends StatelessWidget {
         onPressed: () {},
         tooltip: 'Increment',
         child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ), 
     );
   }
 }
 
 ```
 
+## 起動方法
+
+これはとても簡単でツールウィンドウのDebug を選択します。
+開いたらConsole と書いてある行の右端にあるDart のアイコンをクリックします。
+するとブラウザでDev Tools が起動します。
+
+![](https://storage.googleapis.com/zenn-user-upload/915aaf94138e-20211117.png)
+
+クリックすると、
+
+![](https://storage.googleapis.com/zenn-user-upload/05d065fdc795-20211117.png)
+
+この画面が現れます。
+ここまできたら準備完了です。
+
+## 機能.1 Flutter Inspector
+
+これから実際にDev Tools を使っていこうと思います。
+
+### 基本的な使い方
+
 まずはDev Tools の画面左にあるWidgetツリーのElevatedButtonをクリックします。
 すると画面右がこのように変わります。
 
 ![](https://storage.googleapis.com/zenn-user-upload/3e45eee88e55-20211117.png)
 
+ぜひ自分のアプリを開発している場合はそちらでもやってほしいです。
 
+ここで驚きなのは、各Widgetのwidth(横幅)とheight(高さ)が明らかなことです。
+これによってpixel単位の開発が可能になります。
+またMain AxisやCross Axisの値も表示されていてありがたいですね。
+
+ちなみにですが、選択したWidgetは画面下のConsoleにも表示されます。
+
+### Select Widget Mode（オススメ！）
+
+次に、画面左上にある『Select Widget Mode』を押してみます。
+
+![](https://storage.googleapis.com/zenn-user-upload/2d66f21765c8-20211117.png)
+
+すると画像のようにボタンが青くなります。この状態でシミュレータの画像部分を押すと、以下のような画面になります。
+
+![](https://storage.googleapis.com/zenn-user-upload/2e2b0e5a9bd0-20211117.png)
+
+![](https://storage.googleapis.com/zenn-user-upload/3d9fe098357b-20211117.png)
+
+このように『Select Widget Mode』を使うことで実際の端末ではどのようにWidgetが配置されているのかを確認することができます。
+
+サンプルアプリの場合、画像の高さ(height)がちゃんと150.0になっているのが確認できます。
+
+もし他のWidgetを確認したい場合はシミュレータの左下にある検索ボタンを押すと、再度Widgetを選択できる状態になります。
+
+![](https://storage.googleapis.com/zenn-user-upload/dc46d65f299f-20211117.png)
+
+
+さらにこの機能でおすすめなのはRowやColumnを選択した時です！
+
+選択した場合、以下のような画面になります。ここでDev Toolsの画面右上のMain Axis と書かれたとこの右にあるstartの横のボタンを押します。
+
+![](https://storage.googleapis.com/zenn-user-upload/eefb9f041dbc-20211117.png)
+
+![](https://storage.googleapis.com/zenn-user-upload/5b0eb1640915-20211117.png)
+
+
+## 機能.2 Performance
+
+## その他機能
+
+### CPU Profiler
+
+### Memory
+
+### Debugger
+
+### Network
 
 
 
