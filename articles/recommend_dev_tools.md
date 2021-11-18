@@ -1,9 +1,9 @@
 ---
-title: "【Flutter】【初心者向け】Dev Tools を使いこなそう" # 記事のタイトル
+title: "【Flutter】【初心者向け】Dev Tools を使ってみよう！" # 記事のタイトル
 emoji: "🧸" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
-published: false # 公開設定（falseにすると下書き）
+published: true # 公開設定（falseにすると下書き）
 ---
 
 # はじめに
@@ -11,7 +11,7 @@ published: false # 公開設定（falseにすると下書き）
 
 今回はFlutter を使うなら欠かせない『Dev Tools』について書いていきます。自分は最近使い始めたのですが、もうこれがないと生きていけません。（それくらい便利です！）
 
-なるべく画像多めで詳しく書いたのでぜひ使ってみてください！！
+なるべく画像多めで詳しく書いたので、使ってなかったよって人はぜひ使ってみてください！！
 
 
 # Dev Tools とは？
@@ -20,13 +20,7 @@ published: false # 公開設定（falseにすると下書き）
 
 Dev Tools というのはFlutter やDart を使って開発をする人向けのもので、アプリのレイアウト検証(layout inspection)やパフォーマンス(performance), メモリ、またデバッグなどを効率よくとこなうためのWebアプリケーションツールです。
 
-かなり便利な機能がいくつもありますが、今回はレイアウト検証(layout inspection)とパフォーマンス(performance)について重点的に解説します。
-
-
-参考動画
-（細かい操作方法も教えてくれているのでかなりおすすめです）
-
-https://www.youtube.com/watch?v=nq43mP7hjAE
+かなり便利な機能がいくつもありますが、今回はレイアウト検証(layout inspection)について重点的に解説します。
 
 :::message alert
 この記事ではAndroidStudio を使って説明していきます。
@@ -130,7 +124,7 @@ class MyHomePage extends StatelessWidget {
 この画面が現れます。
 ここまできたら準備完了です。
 
-## 機能.1 Flutter Inspector
+## Flutter Inspector
 
 これから実際にDev Tools を使っていこうと思います。
 
@@ -163,14 +157,14 @@ class MyHomePage extends StatelessWidget {
 
 このように『Select Widget Mode』を使うことで実際の端末ではどのようにWidgetが配置されているのかを確認することができます。
 
-サンプルアプリの場合、画像の高さ(height)がちゃんと150.0になっているのが確認できます。
+実際にサンプルアプリの場合、画像の高さ(height)がちゃんと150.0になっているのが確認できます。
 
 もし他のWidgetを確認したい場合はシミュレータの左下にある検索ボタンを押すと、再度Widgetを選択できる状態になります。
 
 ![](https://storage.googleapis.com/zenn-user-upload/dc46d65f299f-20211117.png)
 
 
-さらにこの機能でおすすめなのはRowやColumnを選択した時です！
+さらにこの機能でオススメなのはRowやColumnを選択した時です！
 
 選択した場合、以下のような画面になります。ここでDev Toolsの画面右上のMain Axis と書かれたとこの右にあるstartの横のボタンを押します。
 
@@ -178,19 +172,32 @@ class MyHomePage extends StatelessWidget {
 
 ![](https://storage.googleapis.com/zenn-user-upload/5b0eb1640915-20211117.png)
 
+ここで例えば、spaceBetweenを選択すると、
 
-## 機能.2 Performance
+![](https://storage.googleapis.com/zenn-user-upload/53fe2c159a48-20211117.png)
 
-## その他機能
+このようにシミュレータの方にも反映されます!
+なのでMainAxisAlignmentの値を変更して、hot reloadしなくても変更した時にどのようにWidgetが配置されるかを確認できます。
 
-### CPU Profiler
+Columnを選択してcenterからspaceEvenlyに変更した場合、以下のようになります。
 
-### Memory
+![](https://storage.googleapis.com/zenn-user-upload/509f8385e248-20211117.png)
 
-### Debugger
+:::message alert
+元々のファイルのソースコードは変更されないので、見た目が確認できたら変更するようにしましょう。
+:::
 
-### Network
+最後に、Details TreeをクリックするとWidgetの引数の値が見れるので地味にこれもオススメです。
 
+![](https://storage.googleapis.com/zenn-user-upload/31c4e2d420bd-20211117.png)
 
+# 終わりに
 
-# まとめ
+Dev Toolsには他にもパフォーマンスを調べたり、メモリの使用量を動作ごとに確認したりすることがきます。自分はまだFlutter Inspectorしか使えていませんが、これからはアプリの速度やパフォーマンスにも気を使っていきたいと思います。
+
+より良いFlutterライフを過ごしていきましょう！！
+
+参考動画
+（細かい操作方法も教えてくれているのでかなりおすすめです）
+
+https://www.youtube.com/watch?v=nq43mP7hjAE
