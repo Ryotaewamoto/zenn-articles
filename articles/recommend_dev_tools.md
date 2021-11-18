@@ -20,7 +20,7 @@ published: true # 公開設定（falseにすると下書き）
 
 Dev Tools というのはFlutter やDart を使って開発をする人向けのもので、アプリのレイアウト検証(layout inspection)やパフォーマンス(performance), メモリ、またデバッグなどを効率よくとこなうためのWebアプリケーションツールです。
 
-かなり便利な機能がいくつもありますが、今回はレイアウト検証(layout inspection)について重点的に解説します。
+かなり便利な機能がいくつもありますが、今回はレイアウト検証(Flutter Inspector)について重点的に解説します。
 
 :::message alert
 この記事ではAndroidStudio を使って説明していきます。
@@ -124,7 +124,7 @@ class MyHomePage extends StatelessWidget {
 この画面が現れます。
 ここまできたら準備完了です。
 
-## layout inspection
+## Flutter Inspector
 
 これから実際にDev Tools を使っていこうと思います。
 
@@ -193,7 +193,7 @@ Columnを選択してcenterからspaceEvenlyに変更した場合、以下のよ
 
 # 終わりに
 
-Dev Toolsには他にもパフォーマンスを調べたり、メモリの使用量を動作ごとに確認したりすることがきます。自分はまだlayout inspectionしか使えていませんが、これからはアプリの速度やパフォーマンスにも気を使っていきたいと思います。
+Dev Toolsには他にもパフォーマンスを調べたり、メモリの使用量を動作ごとに確認したりすることがきます。自分はまだFlutter Inspectorしか使えていませんが、これからはアプリの速度やパフォーマンスにも気を使っていきたいと思います。
 
 より良いFlutterライフを過ごしていきましょう！！
 
