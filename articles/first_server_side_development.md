@@ -33,7 +33,16 @@ published: false # 公開設定（falseにすると下書き）
 
 https://docs.docker.com/desktop/mac/install/
 
-Linuxコマンドを覚える
+最低限のLinuxコマンドを覚える
+```
+$ pwd
+$ cd
+$ ls
+$ mkdir
+$ touch
+```
+
+dockerFileがimageの雛形(アプリコード、ライブラリ、ベースイメージ)
 
 
 参考文献
