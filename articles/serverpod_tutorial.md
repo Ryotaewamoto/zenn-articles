@@ -1,5 +1,5 @@
 ---
-title: "【Flutter】Serverpodを触ってみた" # 記事のタイトル
+title: "【Flutter】Serverpodをちょっとだけ触ってみた" # 記事のタイトル
 emoji: "🍰" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
