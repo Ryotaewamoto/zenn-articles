@@ -46,9 +46,9 @@ https://www.fenet.jp/infla/column/%E6%9C%AA%E5%88%86%E9%A1%9E/redis%E3%81%A8%E3%
 $ dart pub global activate serverpod_cli
 ```
 
-自分の場合以下のWarningが出たのでそのまま``export PATH="$PATH":"$HOME/.pub-cache/bin"``を入力したらうまく行きました。どうやらパスが通ってなかったよう？
+自分の場合以下のWarningが出ました。
 
-```shell
+```
 Warning: Pub installs executables into $HOME/.pub-cache/bin, which is not on your path.
 You can fix that by adding this to your shell's config file (.bashrc, .bash_profile, etc.):
 
@@ -57,6 +57,13 @@ You can fix that by adding this to your shell's config file (.bashrc, .bash_prof
 Activated serverpod_cli 0.9.5.
 ```
 
+どうやらパスが通っていないので、.bashrcや.zshrcへ次を追記します。
+
+```
+  export PATH="$PATH":"$HOME/.pub-cache/bin"
+```
+
+無事うまく行きました。
 うまくいくと``serverpod``と入力したら以下のようなHELPがでます。
 わからなくなった時に使いましょう。
 
