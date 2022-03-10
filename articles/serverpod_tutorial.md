@@ -16,6 +16,10 @@ https://pub.dev/documentation/serverpod/latest/
 の前半部分をまとめたものです。この記事ではデータベースとのやりとりなどは記述していません。ご了承ください。
 後半部分位ついてもいずれは出そうと思います。
 
+# Serverpodとは？
+
+Serverpodとは、DartとFlutterを使用したアプリとWebサーバーを構築するパッケージです。これはサーバーサイドをDartで書け、またAPIの自動生成でき、データベースとの接続を最小限の力で可能にします。このパッケージのテストはMacで行われているのでMacが推奨されていますがWindowsでも動くようです。
+
 # 事前準備（インストール）
 - FlutterとDart
 バージョンは2.0以降です。
@@ -30,7 +34,7 @@ https://docs.docker.com/desktop/mac/install/
 PostgreSQLとRedisについて以下の記事が参考になりそうです。
 
 - PostgreSQLとは？ 初めてデータベースに触る人のための『PostgreSQL徹底入門 第4版』から紹介
-https://codezine.jp/article/detail/11753#:~:text=%E3%81%97%E3%81%A6%E3%81%84%E3%81%BE%E3%81%99%E3%80%82-,%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB,%E7%84%A1%E6%96%99%E3%81%A7%E5%88%A9%E7%94%A8%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%80%82
+https://postgresweb.com/what-is-postgresql
 
 - Redisとはどのようなデータベース？3つの特徴や使い方についても解説
 https://www.fenet.jp/infla/column/%E6%9C%AA%E5%88%86%E9%A1%9E/redis%E3%81%A8%E3%81%AF%E3%81%A9%E3%81%AE%E3%82%88%E3%81%86%E3%81%AA%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%EF%BC%9F3%E3%81%A4%E3%81%AE%E7%89%B9%E5%BE%B4%E3%82%84%E4%BD%BF%E3%81%84/
