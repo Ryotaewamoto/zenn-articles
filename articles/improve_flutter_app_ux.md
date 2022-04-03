@@ -1,5 +1,5 @@
 ---
-title: "最後にちょっとだけ実装してみませんか？【3選】" # 記事のタイトル
+title: "【Flutter】最後にちょっとだけ実装してみませんか？" # 記事のタイトル
 emoji: "🛩" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
