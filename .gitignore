@@ -22,4 +22,4 @@ doc/api/
 
 # テンプレートのファイルをgitの管理対象外とする
 node_modules
-# articles/template
+articles/template
