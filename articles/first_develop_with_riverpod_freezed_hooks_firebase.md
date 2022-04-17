@@ -318,7 +318,7 @@ body: Center(
 
 :::message alert
 他の少し古い記事を見てみるとuseProvider()を使っていることが多いと思います。
-useProviderはRiverpodのアップデートで使用できなくなっているので基本はref.watch()を使います。ただしIconButtonのonPressed内でなど非同期な処理を行う場合はref.rea()を使用してください。
+useProviderはRiverpodのアップデートで使用できなくなっているので基本はref.watch()を使います。ただしIconButtonのonPressed内でなど非同期な処理を行う場合はref.read()を使用してください。
 :::
 
 Riverpodのバージョンによる変更は以下の記事がとても参考になります！
