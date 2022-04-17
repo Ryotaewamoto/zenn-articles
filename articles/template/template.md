@@ -7,7 +7,7 @@ published: false # 公開設定（falseにすると下書き）
 ---
 
 # はじめに
-ご覧いただきありがとうございます。ganです。
+ご覧いただきありがとうございます。[gan](https://zenn.dev/ryota_iwamoto)です。
 
 # 今回の内容
 
