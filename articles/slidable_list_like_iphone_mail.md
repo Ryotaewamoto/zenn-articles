@@ -581,6 +581,9 @@ List<Map<String, dynamic>> messageData = [
 
 いかがだったでしょうか？今回はiPhoneのメールをもとに少しネタ的な記事を書いてみました。
 
+ぜひflutter_slidableパッケージを使ってみてください！
+
+最後まで読んでいただきありがとうございました！
 
 # 使用したデータ
 
