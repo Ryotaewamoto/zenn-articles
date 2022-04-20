@@ -1,5 +1,5 @@
 ---
-title: "【Flutter】リストの要素を横にスライドさせたい(iPhoneのメール的な)" # 記事のタイトル
+title: "【Flutter】リストの要素を横にスライドさせたい(iPhoneのメール的な)[2022/04/20時点]" # 記事のタイトル
 emoji: "👆" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
