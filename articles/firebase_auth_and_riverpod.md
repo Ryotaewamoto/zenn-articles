@@ -306,3 +306,9 @@ test01@gmail.comというメールアドレスでログイン後、ログアウ�
 自分も正直まだわからない点が山ほどあるので少しずつ記事として残していこうと思います！
 
 最後まで読んでいただきありがとうございました。さらばっ！
+
+# 参考文献
+- https://riverpod.dev/ja/docs/concepts/providers/
+- https://riverpod.dev/ja/docs/concepts/modifiers/auto_dispose/
+- https://note.com/mxiskw/n/n5c06bc2dd0d5
+- https://zenn.dev/riscait/books/flutter-riverpod-practical-introduction/viewer/migrate-to-v1
