@@ -236,7 +236,7 @@ class AuthVerification extends HookConsumerWidget {
 > - 「イミュータブル（不変）」 なステートを公開するため（イミュータブルではあるが、イベントに応じて変わることがある）。
 > - ステートを変更するためのロジック（いわゆるビジネスロジック）を一つの場所で集中管理して保守性を高めるため。
 
-と記述してあります。今回のようにただの認証だけであれば``StateNotifierProvider``をつかわないで行ける気がしますが、WidgetからRepositoryProviderを直接呼ぶのを避けるために自分は以下のように作成しました。
+と記述してあります。今回のようにただの認証だけであれば``StateNotifierProvider``を使わないで行ける気がしますが、WidgetからRepositoryProviderを直接呼ぶのを避けるために自分は以下のように作成しました。
 
 ```dart:auth_provider.dart
 final authControllerProvider = StateNotifierProvider.autoDispose<AuthController, User?>(
