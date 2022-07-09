@@ -356,7 +356,13 @@ https://github.com/Ryotaewamoto/riverpod_pracitce_app
 ここではFirebaseに絞って解説します。おそらくここが一番気になる人が多いと思うので！
 
 ## Firebase
-FirebaseについてはFirestoreとFirebaseAuthを使います。認証は「匿名」を使用しています。
+FirebaseについてはFirestoreとFirebaseAuthを使います。ここでは認証として「匿名」を使用しています。
+
+(追記:2022/07/09)
+メールアドレスを用いた認証に関しては別の記事で書いたのでよければ参考にしてください！
+
+https://zenn.dev/ryota_iwamoto/articles/firebase_auth_and_riverpod
+
 
 FirestoreのCRUD操作についてはRiverpodを用いて以下のように記述しています。
 また抽象クラスを作る意味については以下の2つの記事が参考になると思います。
