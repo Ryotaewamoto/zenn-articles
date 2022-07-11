@@ -1,5 +1,5 @@
 ---
-title: "【中級者向け】Firebase Authを用いたRiverpod入門" # 記事のタイトル
+title: "【Flutter中級者向け】Firebase Authを用いたRiverpod入門" # 記事のタイトル
 emoji: "🐔" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart", "Firebase"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
