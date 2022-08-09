@@ -19,7 +19,7 @@ published: true # 公開設定（falseにすると下書き）
 、これは私の純粋な疑問です。
 もしこれを聞かれた時にサクッと答えられたら、シンプルにカッコ良くないですか？？
 それにコードが書けるエンジニアはたくさんいます。ですが一流のエンジニアを目指すのであればこういう言葉の意味までよく理解しておく必要があると私は思います。
-ということでこの記事を読んでNull Safetyの理解を深めましょう！
+ということでこの記事を読んでNull Safety の理解を深めましょう！
 
 :::message
 使い方に関してはさまざまな良い記事があるのそちらを読んでください。ここではNull Safety とは何かをまとめた上で、その意味についてより理解を深めていただければと思います。
@@ -43,9 +43,23 @@ published: true # 公開設定（falseにすると下書き）
 Null Safety を日本語で訳すとすれば「Null安全（もしくはNull安全性）」でしょう。
 ではNull Safety とSound Null Safety の違いは何でしょうか？
 
-Soundの意味を考慮するのであれば、Sound Null Safety はNull Safety を**音に出すor警告する**ものということになります。
+Sound の意味を考慮するのであれば、Sound Null Safety はNull Safety を**音に出すor警告する**ものということになります。
 
 公式でもSound Null Safety という言葉を使っているのは冒頭程度で、それ以外はNull Safety という言葉を使っています。そのため、説明などをする際にはNull Safety という言葉を使っていくのがよさそうです。
+
+:::message alert
+Null Safety の説明の際に、
+
+Sound の意味を考慮するのであれば、Sound Null Safety はNull Safety を音に出すor警告するもの
+
+と書きましたがこれは間違いです。ここでのSound は音を出すといった動詞の意味ではなく、**健全な**という形容詞的な意味になります。
+よって、Sound Null Safety の意味は**健全なNullの安全性**ということになります。
+
+[kariya1975](https://zenn.dev/kariya1975)さん、教えていただきありがとうございます。
+
+(2022/08/09 追記)
+:::
+
 
 ## Null許容型
 
@@ -80,7 +94,7 @@ class User {
 
 ## Sound Null Safety がないDart
 
-まず**Sound Null Safety がないDartの場合** を見てください。
+まず**Sound Null Safety がないDart の場合** を見てください。
 
 ```dart
 
@@ -107,7 +121,7 @@ child: Text(user.firstName),
 
 ## Sound Null Safety があるDart
 
-次に**Sound Null Safety があるDartの場合** を見てください。
+次に**Sound Null Safety があるDart の場合** を見てください。
 
 ```dart
 class User {
@@ -127,7 +141,7 @@ class User {
 }
 ```
 
-Dart では、型の末尾に``?``にをつけることでnull許容型にすることができます。そして先ほどと同様にどこかで呼び出してみましょう。Null Safetyでない場合と同じようにして書くとこれはエラーになります。
+Dart では、型の末尾に``?``にをつけることでnull許容型にすることができます。そして先ほどと同様にどこかで呼び出してみましょう。Null Safety でない場合と同じようにして書くとこれはエラーになります。
 
 ```dart
 
@@ -139,7 +153,7 @@ child: Text(user.firstName), // コンパイルエラー
 
 ```
 
-これでは、``firstName``はNullになり得るからダメだよ！Textの引数にはString型を渡してね！と注意されます。
+これでは、``firstName``はNull になり得るからダメだよ！Text の引数にはString型を渡してね！と注意されます。
 
 以下のようにすればエラーの文言は消えますが、結局``User``クラスの``firstName``はnullなので実行時にエラーが出ます。Null Safety があるとは言え、完璧にエラーをなくすにはどちらにしろ書き手の意識が必要があるということです。
 
@@ -165,7 +179,7 @@ child: Text(user.firstName!),　// 「!」を加えた
 
 **Null許容型の変数のNull という状態に対してコンパイルエラーを出してくれる**
 
-ということではないかと思います。Null Safetyというのは絶対的に必要なものではなく、Nullによるエラーを言語の設定として防ぐものであるということです。
+ということではないかと思います。Null Safety というのは絶対的に必要なものではなく、Nullによるエラーを言語の設定として防ぐものであるということです。
 
 
 # まとめ
