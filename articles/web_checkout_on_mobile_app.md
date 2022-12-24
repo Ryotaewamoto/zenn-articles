@@ -1,9 +1,9 @@
 ---
 title: "モバイルアプリでWeb上決済を導入する" # 記事のタイトル
-emoji: "👶" # アイキャッチとして使われる絵文字（1文字だけ）
+emoji: "🍺" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "firebase", "stripe", "ios", "android"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
-published: false # 公開設定（falseにすると下書き）
+published: true # 公開設定（falseにすると下書き）
 ---
 
 :::message
@@ -21,19 +21,19 @@ https://qiita.com/advent-calendar/2022/flutteruniv
 - Stripe と Firestore との連携
 
 # 対象の読者
-- 決済には興味があるがあまり実装のイメージがつかないと感じている方
-- 実際に、実装のコストを抑えて決済機能を導入したい方
+- 決済には興味があるが、あまり実装のイメージがつかめないと感じている方
+- 実装のコストを抑えて決済機能を導入したい方
 
 # はじめに
 ご覧いただきありがとうございます。[gan](https://zenn.dev/ryota_iwamoto)です。
 
-この記事を通して、モバイルアプリに”Web上で行う”決済の導入方法を知っていただけたらと思います。実際に導入することも意識して書きました。その部分も注目していただけると幸いです。またクライアント側にはFlutterを使用しますが、iOS、Android、加えてWebのフロントエンドでもほとんど同じように実装できます。（Firebase の設定やクライアント側のコードは異なりますが）。
+この記事を通して、モバイルアプリに”Web上で行う”決済の導入方法を知っていただけたらと思います。実際に導入することを意識して書きました。その部分も注目していただけると幸いです。またクライアント側にはFlutterを使用しますが、iOS、Android、加えてWebのフロントエンドでもほとんど同じように実装できます。（その場合、Firebase の設定やクライアント側のコードは異なります。）
 少し長い記事になりますので時間をとってじっくり見ていただけたら嬉しいです。
 また、至らぬ点があればコメントしてもらえると私も勉強になります。
 ぜひよろしくお願いします！
 
 # 実装内容（仕様）
-実装内容をイメージできるように簡単な仕様について先に書いておきます。あくまで決済部分に焦点を当てるため、Firebase の設定やStripeの準備等は割愛します。
+実装内容をイメージできるように簡単な仕様について先に書いておきます。あくまで決済部分に焦点を当てるため、Firebase の設定や Stripe の準備等は割愛します。
 
 ## 実装したいこと（重要）
 - アプリ内にユーザが存在し、ユーザはサブスクリプションを購読することができる。
@@ -41,7 +41,7 @@ https://qiita.com/advent-calendar/2022/flutteruniv
 - 存在するサブスクリプションのプランは一つとする。
 
 ## 実装イメージ
-決済部分のイメージ図になります。
+決済部分のイメージ図になります。最初の画面のボタンは『サブスクリプションを購読』と書いてあります。少し見づらくてすいません。
 
 ![](https://storage.googleapis.com/zenn-user-upload/8a56ca0048ce-20221224.png)
 
@@ -54,7 +54,7 @@ https://qiita.com/advent-calendar/2022/flutteruniv
 - サーバーサイドは **Cloud Functions** で対応します。
 
 ## 事前知識
-具体的なデータベース設計や実装に入る前にこの実装の要となる**Stripe Checkout**と**Firebase Dynamic Links**について説明します。
+具体的なデータベース設計や実装に入る前にこの実装の要となる **Stripe Checkout** と **Firebase Dynamic Links** について説明します。
 
 ### Stripe Checkout
 Stripe Checkout とは、
@@ -76,20 +76,21 @@ Firebase Dynamic Links とは、
 
 > Firebase Dynamic Linksは、複数のプラットフォームで、アプリが既にインストールされているかどうかに関係なく、希望どおりに機能するリンクです。ダイナミックリンクを使用すると、ユーザーはリンクを開いたプラットフォームで利用可能な最高のエクスペリエンスを得ることができます。ユーザーがiOSまたはAndroidでダイナミックリンクを開くと、ネイティブアプリのリンクされたコンテンツに直接移動できます。ユーザーがデスクトップブラウザで同じダイナミックリンクを開くと、Webサイトの同等のコンテンツに移動できます。
 
-ということです。自分が説明をする必要がないぐらいわかりやすいのですが、改めて『関西弁のおばちゃんを召喚して』説明すると、『**うち（Firebase）の Dynamic Links はすごいでー。この　Dynamic Links を使えば、Webサイトからアプリの画面に（インストールに関わらず）飛ばすことができるんやでー**』という感じです。
+ということです。自分が説明をする必要がないぐらいわかりやすいのですが、改めて『関西弁のおばちゃん風に』説明すると、『**うち（Firebase）の Dynamic Links はすごいでー。この　Dynamic Links を使えば、Webサイトからアプリの画面に（インストールに関わらず）飛ばすことができるんやでー**』という感じです。
 
 今回の実装で Dynamic Links がどこで活躍するのかというと、**決済完了後にアプリの画面に戻す**ときになります。
 
 ## データベース設計
 最低限のフィールドのみ記述します。そのため実際に導入する際は必要に応じてフィールドを追加してください。
 
-また、Firestore は NoSQL です。SQL を使う場合にはデータベース設計は異なると思いますので、その点はご注意ください。
+また、Firestore は NoSQL 型のデータベースです。SQL 型のデータベースを使う場合、ここの設計は異なると思いますので、その点はご注意ください。
 
 ```json
 {
     "collection: appUsers": { // ユーザ
         "document: {appUserId}": {
             "appUserId": "{appUserId}",
+            "email": "sample@gmail.com",
             "customerId": "cus_xxxxxxxx",
             "createdAt": "2022-12-25 15:00",
             "collection: subscriptions": { // サブスクリプション
@@ -106,31 +107,31 @@ Firebase Dynamic Links とは、
 ```
 
 ## 主要なフィールドの解説
-以下、Stripe周りで必要になるフィールドがあるので解説します。
+以下、Stripe 周りで必要になるフィールドがあるので解説します。
 
 ### customerId: 顧客情報
-customerId とは、Stripe上のユーザ情報を含むエンティティ（Customer（＝顧客））のIDになります。ここにはユーザのメールアドレスやクレジットカード情報が含まれます。定期決済が何かしらの理由により失敗した場合にはcustomerに含まれるメールアドレスに支払いを請求することができます。より詳細な情報は[こちら（Stripeのドキュメント）](https://stripe.com/docs/billing/customer?locale=ja-JP)を参照してください。
+customerId とは、Stripe 上のユーザ情報を含むエンティティ（ Customer（＝顧客））のIDになります。ここにはユーザのメールアドレスやクレジットカード情報が含まれます。定期決済が何かしらの理由により失敗した場合には Customer に含まれるメールアドレスに支払いを請求することができます。より詳細な情報は[こちら（Stripeのドキュメント）](https://stripe.com/docs/billing/customer?locale=ja-JP)を参照してください。
 こちらはユーザを作成する、つまりはサインアップの際に customerId を作成します。作成する関数は Firebase Cloud Functions を使用します。
 
 ### stripeSubscriptionId: サブスクリプション情報
 stripeSubscriptionId は、Stripe 上のサブスクリプションの情報を特定するために使用するフィールドです。Stripe では Subscription というオブジェクトの　``id``　で取得できます。subscriptionId というフィールド名でも良いのですが、アプリのデータベース上の名前（Firestore のフィールド名）と区別するために　``stripe``　という接頭辞を追加しています。より詳細な Subscription オブジェクトの情報は[こちら（Stripeのドキュメント）](https://stripe.com/docs/api/subscriptions/object)を参照してください。
-こちらは具体的なサブスクリプションの登録をする際に作成します。作成は、 customerId と同様に Firebase Cloud Functions を使用して行います。
+こちらはユーザがサブスクリプションの登録（＝購読を開始）をする際に作成します。作成は、 customerId と同様に Firebase Cloud Functions を使用して行います。
 
 ### status: サブスクリプションの状態
 status は、作成したサブスクリプションの状態を表す値になります。Stripe では status の値として、``incomplete``, ``incomplete_expired``, ``trialing``, ``active``, ``past_due``, ``canceled``, または ``unpaid`` を取ることができます。ただし今回使用するのは基本的に``incomplete``, ``active``, ``canceled``しか使いません。より詳細な status の情報は[こちら（Stripeのドキュメント）](https://stripe.com/docs/api/subscriptions/object)を参照してください。
-こちらもFirebase Cloud Functions を使用して変更を行います。Stripe では Webhook (何かしらのオブジェクトの作成や更新に対して、それが行われたタイミングで何か登録した処理を行うこと)が用意されているのでこれを使用して Firestore 上の status の値を変更します。詳しくは以下の　Stripe の部分で解説します。
+こちらも Firebase Cloud Functions を使用して変更を行います。Stripe では Webhook (何かしらのオブジェクトの作成や更新に対して、それが行われたタイミングで何か登録した処理を行うこと)が用意されているのでこれを使用して Firestore 上の status の値を変更します。詳しくは以下の　Stripe の部分で解説します。
 
 # 実装手順
 
-1. 必要なものを準備
+1. 事前準備
 2. Stripe（商品の登録）
 3. Firebase Dynamic Links
 4. Cloud Functions（サーバーサイド)
 5. Stripe（Webhookの設定）
 6. Flutter(クライアント)
 
-## 必要な準備
-以下に関しては事前に用意しておく必要があります。使用の用途の説明も加えておきました。
+## 事前準備
+以下に関しては事前に用意しておく必要があります。それぞれ使用の用途の説明も加えておきました。
 
 - ユーザがログインする画面（Flutter）
 理由: ユーザに customerId を付与
@@ -209,14 +210,14 @@ https://firebase.google.com/docs/dynamic-links
 - Stripe の Subscription の status を Firestore に反映する関数
 - Stripe の Subscription を解除する関数
 
-関数作成後は、忘れずに cloud functions のデプロイを行なってください。
+関数作成後は、忘れずに Cloud functions のデプロイを行なってください。
 
 ### ユーザに customerId を付与するための関数
 こちらは Stripe API を使用します。あらかじめシークレットキー等の設定を済ませておいてください。コードは以下のようになります。
 
 こちらはユーザのメールアドレスを引数として、Stripe 上にメールアドレスの紐付いた customer を作成する関数になります。この後クライアント側でこの関数を呼ぶため``onCall``を使用し、Firestore に値を追加するために返り値を customerId にしています。（別の実装としては、Firestore でユーザドキュメントを作成後に``onCreate``でこちらの関数を呼び、ユーザのフィールドに customerId を追加する方法もあります。）
 
-```ts
+```ts:stripe.ts
 // Stripe の customer を作って customerId を返す関数
 export const createCustomer = functions
   .region('asia-northeast1')
@@ -239,7 +240,7 @@ https://stripe.com/docs/api/customers/create
 
 ここで重要なのが、Stripe Checkout では customerId を引数に取れることです。Stripe PaymentLinks ではこれができないので Checkout を採用しています。また必須の引数についても説明します。``mode``は決済がどのタイプかを値に入れます。また``successUrl``も必須になります。ここには先ほど作成した決済成功時用の Dynamic Links を入れます。``cancelUrl``はオプショナルな値ですが、決済キャンセル用の Dynamic Links を値に入れます。``line_items``の値には Stripe で登録した商品のIDを入れます。
 
-```ts
+```ts:stripe.ts
 // Stripe Checkout の決済リンクを作成する関数
 export const createStripeCheckoutSession = functions
   .region('asia-northeast1')
@@ -276,7 +277,7 @@ https://stripe.com/docs/api/checkout/sessions/create
 
 こちらの関数は Stripe Webhook で利用する関数であるので、Webhook が正常なものかを確かめるための関数を用意しておきます。
 
-```ts
+```ts:stripe.ts
 /// StripeのWebHookが不正なリクエストでないか確認する(Webhook で使用するため)
 function verifyStripeSignature(key: String, req: any, res: any): any {
   const sig = req.headers['stripe-signature']
@@ -300,7 +301,7 @@ Firestore 上に Subscription ドキュメントを作成する関数のコー�
 2. Firestore 上に Subscription ドキュメントを作成する
 
 :::details Firestore 上に Subscription ドキュメントを作成する関数（TypeScript）
-```ts
+```ts:stripe.ts
 /// Stripe Webhook のシークレットキー(こちらは古い書き方になります。.envファイルでキーを登録すべし)
 const createSubscriptionWebSec =
   functions.config().secret.stripe.webhook_secret.create_subscription
@@ -381,7 +382,7 @@ export const createFirestoreSubscriptionDoc = functions
 こちらは、Stripe の Subscription の status の変更がトリガーとなって呼ばれる関数になります。Stripe の Subscription の ID と Firestore にある``stripeSubscriptionId``を比較して一致するドキュメントの``status``を変更するようにしています。また、この関数は Firestore の Subscription ドキュメントの作成時（作成してから数秒後）に呼ばれるため、５秒の遅延を挟むようにしています。こちら詳細に関しては実装上の注意の方で説明します。
 
 :::details Subscription の status を Firestore に反映する関数（TypeScript）
-```ts
+```ts:stripe.ts
 /// Stripe Webhook のシークレットキー(こちらは古い書き方になります。.envファイルでキーを登録すべし)
 const updateSubscriptionWebSec =
   functions.config().secret.stripe.webhook_secret.update_subscription
@@ -444,7 +445,7 @@ function delay(ms: number) {
 
 こちらは Stripe の Subscription を解除するための関数になります。解除する際には Stripe の Subscription の ID が必要になるので、これを引数とするような``onCall``関数を使用しています。
 
-```ts
+```ts:stripe.ts
 // Stripe の Subscription を解除する関数
 export const cancelStripeSubscription = functions
   .region('asia-northeast1')
@@ -503,7 +504,7 @@ Flutter(iOS, Android) では Firebase Dynamic Links を使用するためにい�
 Cloud Functions で作成した``onCall``関数を呼び出すためのクラスを作成します。
 
 :::details StripeRepository
-```dart
+```dart:stripe_repository.dart
 // import文は省略
 
 final stripeRepositoryProvider = Provider.autoDispose((_) => StripeRepository());
@@ -572,9 +573,11 @@ final customerId = await ref.read(stripeRepositoryProvider).createCustomer(email
 ```
 
 #### サブスクリプション決済時
-決済リンクを作成し、ブラウザに遷移させるコードを記述します。
+決済リンクを作成し、ブラウザに遷移させるコードを記述します。ユーザはこの画面から決済ページに飛びます。
 
-```dart
+なお、build 関数等は省略して書きます。
+
+```dart:subscribe_page.dart
 // ボタンを連続で押されて複数の決済リンクが作られることを防ぐための変数です。
 // こちら flutter_hooks を使用しているのでこちらもパッケージのインストールが必要です。
 final isEnable = useState(true);
@@ -591,7 +594,6 @@ StreamBuilder<PendingDynamicLinkData>(
       }
     }
 
-    // ブラウザに遷移する前の画面（好きな画面を用意してください）
     return Scaffold(
       appBar: const AppBar(
         title: '決済確認ページ',
@@ -653,10 +655,10 @@ await ref.read(stripeRepositoryProvider).cancelStripeSubscription(subscriptionId
 ## 1. 環境分けの対応
 この実装において環境わけで注意するのは以下の2点です。
 
-1. Firebase Dynamic Links の作成をFirebase のプロジェクトごとに行う
+1. Firebase Dynamic Links の作成を Firebase のプロジェクトごとに行う
 2. 1. にあわせてくらい Flutter（クライアント側）で環境ごとに設定を行う
 
-詳しい説明をします。1. に関しては環境ごとに Firebase Dynamic Links を使用してリンクを作成する必要があります。具体的に、自分はアプリのドメイン名の部分の末尾に``dev``等をつけて本番環境のURLと開発環境のURLを区別しました。この設定が終わったら Cloud Functions のコードも環境ごとに変える必要があります。Firebase の環境分けには``firebase use``コマンドを使用しました。これによって Stripe の環境も変えています。決済リンクを作成する際に Dynamic Links を使用しているので下記のようにコードを加えます。
+詳しい説明をします。1. に関しては環境ごとに Firebase Dynamic Links を使用してリンクを作成する必要があります。具体的に、自分はアプリのドメイン名の部分の末尾に ``dev`` 等をつけて本番環境のURLと開発環境のURLを区別しました。この設定が終わったら Cloud Functions のコードも環境ごとに変える必要があります。Firebase の環境分けには ``firebase use`` コマンドを使用しました。これによって Stripe の環境も変えています。決済リンクを作成する際に Dynamic Links を使用しているので下記のようにコードを加えます。
 
 ```diff ts
 // Stripe Checkout の決済リンクを作成する関数
@@ -707,13 +709,13 @@ export const createStripeCheckoutSession = functions
 
 ちなみに Dynamic Links を作成する際に App Store ID は開発環境の方も本番のアプリの App Store ID を入力して問題ありませんでした。
 
-次に2. に関しては[公式ページ](https://firebase.google.com/docs/dynamic-links/flutter/receive)の設定を開発環境と本番環境それぞれやる必要があるということです。profile の変更やXcodeでの操作もあり大変ですが頑張りましょう！
+次に2. に関しては[公式ページ](https://firebase.google.com/docs/dynamic-links/flutter/receive)の設定を開発環境と本番環境それぞれやる必要があるということです。profile の変更や Xcode での操作もあり大変ですが頑張りましょう！
 
 ## 2. サブスクリプションの一意性
-基本的に Stripe では同じサブスクリプションを複数購読できてしまいます。簡単な例を出すと、Amazon Prime の会員になったときに一つのアカウントに一つでいいのに、2個も3個も登録ができてしまうということです。また Web上の決済なので、決済リンクを作成後にアプリに戻ってもう一回決済リンクを作成して、、、としていくと、何個でもブラウザ上に決済ページのタブが作成できてしまいます。正常系では異常ないのですが、異常系としてこれは対応すべきです。そのために、サブスクリプションを購読する際には同じ商品に対して既にサブスクリプションが購読されていないかを確認し、そのサブスクリプションを解除してから新たにサブスクリプションを購読するような設計にしています。それが以下のコードに該当します。加えて、決済完了後は決済できる画面に遷移しないようにすることで大幅にこの問題の発生率を減らせます。
+基本的に Stripe では同じサブスクリプションを複数購読できてしまいます。簡単な例を出すと、あなたが Amazon Prime の会員になったときに一つのアカウントに一つのサブスクリプションでいいのに、2個も3個も登録ができてしまうということです。また Web上の決済なので、決済リンクを作成後にアプリに戻ってもう一回決済リンクを作成して、、、としていくと、何個でもブラウザ上に決済ページのタブが作成できてしまいます。正常系では異常ないのですが、異常系としてこれは対応すべきです。そのために、サブスクリプションを購読する際には同じ商品に対して既にサブスクリプションが購読されていないかを確認し、そのサブスクリプションを解除してから新たにサブスクリプションを購読するような設計にしています。それが以下のコードに該当します。加えて、決済完了後は決済できる画面に遷移しないようにすることで大幅にこの問題の発生率を減らせます。
 
 :::details Firestore 上に Subscription ドキュメントを作成する関数（TypeScript）
-```ts
+```ts:stripe.ts
 /// Stripe Webhook のシークレットキー(こちらは古い書き方になります。.envファイルでキーを登録すべし)
 const createSubscriptionWebSec =
   functions.config().secret.stripe.webhook_secret.create_subscription
@@ -795,7 +797,7 @@ export const createFirestoreSubscriptionDoc = functions
 これはまだクリアできていない課題になります。ブラウザ上の決済画面に遷移後にアプリを閉じる動作をユーザがすると、Dynamic Links の受信ができなくなってしまうということです。この場合にはアプリ側に Dynamic Links で戻ってきたときに決済完了画面は表示されずに決済が完了することになります。決済リンク作成後は自動でブラウザに飛ぶのであまり怒らない事象ではありますが、開発者はその点を留意しておく必要があります。
 
 ## 4. なぜ Flutter の WebView を使用しないのか
-これについて、まずこの実装をしようとしたきっかけが、アプリを App Store に審査を出した際にアプリ内ではなくアプリ外（ブラウザやSMS等）で決済をするようにとリジェクトされたことです。WebView というグレーラインを攻めるよりはいっそちゃんとブラウザで決済しようと考えたからです。（無事審査は通りました）またいつか見た記事で、『WebView ではユーザが入力した情報は開発者は知ることができる』というものがあったからです。実際に自分で実装することはできませんが、そのような危険性がある以上は WebView での決済は危険であると思いこのような実装になりました。
+これについて、まずこの実装をしようとしたきっかけが、アプリを App Store に審査を出した際にアプリ内ではなくアプリ外（ブラウザやSMS等）で決済をするようにとリジェクトされたことです。WebView というグレーラインを攻めるよりはいっそちゃんとブラウザで決済しようと考えたからです。（無事審査は通りました😄）また、いつか見た記事で、『WebView ではユーザが入力した情報は開発者は知ることができる』というものがあったからです。実際に自分で実装することはできませんが、そのような危険性がある以上は WebView での決済は危険であると思いこのような実装になりました。実際にアプリに危険がなかったとしても、セキュリティに関してのリテラシーが高いユーザは気づきます。これらの理由を踏まえてこの記事のような実装に取り組みました。
 
 参考:
 https://gigazine.net/news/20220902-tiktok-android-vulnerability/
@@ -837,8 +839,16 @@ https://developer.apple.com/jp/app-store/review/guidelines/#payments
 # 終わりに
 ここまで読んでいただきありがとうございます。自分が思っていたものよりもかなりボリュームのある記事になってしまいました。そのため、もしかしたら全く読まれないかもしれません。ですが、個人的にはかなり詳細に書いたつもりではあります。至らぬ点も多いかと思いますが、見つけた際にはご指摘いただけると幸いです。
 
-2022年は Flutter をメインに触っている年でした。ハッカソンに出たり、オフラインの技術イベントに参加したりと学びの多い一年でした。また、この Zenn というサービスのおかげで快適に楽しく記事を書くことができました。開発者の皆さん、ありがとうございます！
+2022年は Flutter をメインに触っている年でした。ハッカソンに出たり、オフラインの技術イベントに参加したりと学びの多い一年でした。また、この Zenn というサービスのおかげで快適に楽しく記事を書くことができました。開発者、運営の皆さん、ありがとうございます！
 
 2023年も開発者の皆さんの益々の発展を心より楽しみにしています！！
 
 それでは良いお年を😆
+
+参考:
+https://qiita.com/kboy/items/c99cc681c29a1b250b4a
+https://www.kamo-it.org/blog/url_launcher/
+https://qiita.com/tokkun5552/items/f27ddb159cb3228bf6b2
+https://qiita.com/mildsummer/items/de1c08d33b295f4633d6
+https://stripe.com/docs/api/webhook_endpoints/object
+https://stackoverflow.com/questions/67422947/prevent-duplicate-subscriptions-with-stripe-checkout
