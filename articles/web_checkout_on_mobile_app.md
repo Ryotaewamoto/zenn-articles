@@ -24,6 +24,15 @@ https://qiita.com/advent-calendar/2022/flutteruniv
 - 決済には興味があるが、あまり実装のイメージがつかめないと感じている方
 - 実装のコストを抑えて決済機能を導入したい方
 
+# 時間がない方へ
+実装の目的やメリット・デメリットについて書いています。記事自体かなり長いので、この記事の以下のあたりを見ておくと良いと思います。
+
+https://zenn.dev/ryota_iwamoto/articles/web_checkout_on_mobile_app#web%E4%B8%8A%E6%B1%BA%E6%B8%88%E3%81%AE%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88%E3%83%BB%E3%83%87%E3%83%A1%E3%83%AA%E3%83%83%E3%83%88
+
+https://zenn.dev/ryota_iwamoto/articles/web_checkout_on_mobile_app#4.-%E3%81%AA%E3%81%9C-flutter-%E3%81%AE-webview-%E3%82%92%E4%BD%BF%E7%94%A8%E3%81%97%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B
+
+
+
 # はじめに
 ご覧いただきありがとうございます。[gan](https://zenn.dev/ryota_iwamoto)です。
 
@@ -90,7 +99,6 @@ Firebase Dynamic Links とは、
     "collection: appUsers": { // ユーザ
         "document: {appUserId}": {
             "appUserId": "{appUserId}",
-            "email": "sample@gmail.com",
             "customerId": "cus_xxxxxxxx",
             "createdAt": "2022-12-25 15:00",
             "collection: subscriptions": { // サブスクリプション
