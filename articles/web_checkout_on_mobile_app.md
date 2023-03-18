@@ -1,5 +1,5 @@
 ---
-title: "モバイルアプリでWeb上決済を導入する" # 記事のタイトル
+title: "【Stripe】モバイルアプリでWeb上決済を導入する" # 記事のタイトル
 emoji: "🍺" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "firebase", "stripe", "ios", "android"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する

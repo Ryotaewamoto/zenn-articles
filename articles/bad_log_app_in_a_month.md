@@ -1,5 +1,5 @@
 ---
-title: "１ヶ月で本格的な Flutter アプリ開発（リポジトリも公開）" # 記事のタイトル
+title: "【Flutter】１ヶ月で本格的なアプリ開発（リポジトリも公開）" # 記事のタイトル
 emoji: "🌟" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Firebase"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
