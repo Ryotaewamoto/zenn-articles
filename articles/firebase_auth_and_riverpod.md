@@ -1,21 +1,32 @@
 ---
-title: "【Flutter中級者向け】Firebase Authを用いたRiverpod入門" # 記事のタイトル
+title: "【Flutter】Firebase Auth による認証の実装から学ぶ Riverpod v2" # 記事のタイトル
 emoji: "🐔" # アイキャッチとして使われる絵文字（1文字だけ）
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Flutter", "Dart", "Firebase"] # トピックス（タグ）["markdown", "rust", "aws"]のように指定する
 published: true # 公開設定（falseにすると下書き）
 ---
 
+<!-- 更新内容（2023-03-24） -->
+<!--
+- gif の削除
+- Riverpod v2 への対応
+  - NotifierProvider
+  - AsyncNotifierProvider
+  - StreamProvider
+- それに伴う Reader の項目の削除
+-->
+
+:::message
+2023-03-24 更新
+:::
+
 # はじめに
 ご覧いただきありがとうございます。[gan](https://zenn.dev/ryota_iwamoto)です。
-RiverpodとFirebase Authを使いたい、、、けど、あんまり情報ない、、、
-そう思ってしまっいまいました。ということでRiverpodとFirebase Authのテンプレート的なコードを考えていこうと思います。
+Riverpod と Firebase Auth を使いたい、、、けど、あんまり情報ない、、、
+そう思ってしまっいまいました。ということで Riverpod と Firebase Auth のテンプレート的なコードを考えていこうと思います。
 こういう実装はどうですか？という提案ですので、こうした方がいい、その書き方はあまり良くない、ということがあればコメントください！おなしゃす！！
 それではよろしくお願いします！
 
-:::message
-UIやWidgetの切り出し、エラーハンドリングなどはあまり触れていないのでご容赦ください。
-:::
 
 # 対象者
 - Riverpod、認知はしてる
@@ -23,36 +34,28 @@ UIやWidgetの切り出し、エラーハンドリングなどはあまり触れ
 - 認証にFirebase Authを使いたい方
 
 # 今回の内容
-- Firebase Authのメールアドレスとパスワードを使ったサインインの実装（全体のコードはgithubから見れます！ぜひ見てね！！）
-- Riverpodの使用したProviderの解説（メイン）
+- Firebase Authのメールアドレスとパスワードを使ったサインインとサインアップ、サインアウトの実装（全体のコードはgithubから見れます！ぜひ見てね！！）
+- Riverpod のプロバイダ(Provider, StreamProvider, NotifierProvider, AsyncNotifierProvider)の解説
 
 # 全体のコード
 
+以下のリポジトリに動画も添付しているので参考にしてみてください！
+
 https://github.com/Ryotaewamoto/riverpod_firebase_auth
-
-# 完成品（githubの方が見やすいかも）
-
-## ログイン
-
-![](https://storage.googleapis.com/zenn-user-upload/b1232dfbdc4e-20220709.gif)
-
-## 新規登録→ログイン
-
-![](https://storage.googleapis.com/zenn-user-upload/8db5cae12628-20220709.gif)
 
 # pubspec.yamlの構成
 ```diff yaml
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.19.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-+  firebase_auth: ^3.3.16
-+  hooks_riverpod: ^1.0.3
-+  flutter_hooks: ^0.18.3
++  firebase_auth: ^4.3.0
++  firebase_core: ^2.8.0
++  hooks_riverpod: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -60,7 +63,6 @@ dev_dependencies:
 
   flutter_lints: ^1.0.0
 
-  firebase_core: ^1.10.0
 ```
 
 # Firebase Authの準備
@@ -69,114 +71,129 @@ dev_dependencies:
 https://zenn.dev/kazutxt/books/flutter_practice_introduction/viewer/firebase_authentication
 
 # Riverpodの解説
-ここでは今回使用する、``Provider``, ``StreamProvider``, ``StateNotifierProvider``の３種類を解説していきます。
+ここでは今回使用する、``Provider``, ``StreamProvider``, ``NotifierProvider``, ``AsyncNotifierProvider``の4種類を解説していきます。
 
-![](https://storage.googleapis.com/zenn-user-upload/60a78c60b73f-20220709.png)
+:::message
+
+2023-03-24 更新内容:
+
+もともと使用していた ``StateNotifierProvider`` の項目を削除し、``NotifierProvider``, ``AsyncNotifierProvider`` の2つを追加しました。
+:::
+
+## 前提
+まず公式ドキュメントでは、プロバイダーが必要な理由として
+
+> ステートをプロバイダでラップすることで次のことが可能になります。
+>
+> (1)アプリの様々な場所からステートにアクセスできるようになります。 つまり、プロバイダはシングルトンやサービスロケータのようなパターン、依存性注入、あるいは InheritedWidget を完全に代替することができます。
+>
+> (2)ステートを別のプロバイダのステートと簡単に組み合わせることができるようになります。 開発では複数のオブジェクトを組み合わせて一つのステートにまとめるのに四苦八苦する場面も多いかと思います。プロバイダにはこのための機能が組み込まれています。
+>
+> (3)アプリのパフォーマンスを最適化してくれます。 例えば、ウィジェット更新の条件を限定したり、負荷が高いステートの計算をキャッシュしたりといったことが可能になります。 プロバイダがステートの変化による外部への影響をコントロールしてくれます。
+>
+> (4)アプリのテスト容易性を高めてくれます。 プロバイダがあれば setUp や tearDown のような面倒な手順は不要です。 さらに、テスト中のプロバイダの挙動をオーバーライドすることができます。 これにより特異な条件下での動作も確認しやすくなります。
+>
+> (5)ロギングやプルリフレッシュ（画面を引っ張って更新）などの高度な機能との組み合わせが容易に実現できます。
+
+と書かれています。このことを前提にそれぞれの Provider の用途について説明してきます。
 
 ## Provider
-まず公式ドキュメントでは、
 
-> Provider はプロバイダの中で最もベーシックなプロバイダであり、値を同期的に生成してくれます。
+まずは基本的な ``Provider`` です。さっそく使用例を見ていきましょう。
 
-というふうに書かれています。これがもっとも基本的なことです。
-ただし、今回はこの**値を同期的に生成**を活用しているところはありません。２点ほど例があるのでそれぞれ見ていきます。
+- 使用例１:
 
-１つ目のProviderの値を同期的に生成という使い方ではない場所としては以下があります。
+```dart:lib/pages/sigh_up_page.dart
+final _nameTextEditingController =
+    Provider.autoDispose<TextEditingController>(
+  (_) => TextEditingController(),
+);
+```
 
-```dart:auth_repository.dart
+主な使用理由は前提の(1)になります。こうすることで、サインアップ画面から ``TextEditingController`` のインスタンスにアクセスできるようにしています。
+
+また、参照されなくなった際に ``TextEditingController`` は破棄されて欲しいので　``.autoDispose`` をつけています。
+
+- 使用例２:
+
+```dart:lib/repositories/auth_repository.dart
 final firebaseAuthProvider =
     Provider<FirebaseAuth>((ref) => FirebaseAuth.instance);
 ```
 
-これは``FirebaseAuth.instance``を
+こちらは同ファイル内で ``AuthRepositoryImpl`` クラスの引数として取るために Provider で定義しています。
 
-- 外部から変更できない
-- グローバルに宣言できるようにする
-
-という点から基本的な``Provider``を使っています。このようにProviderの**値を同期的に生成**という使い方がメインにならない場合もあります。
-
-
-そして２つ目は以下のコードです。
-
-```dart:auth_repository.dart
-// AuthRepository Provider を定義（ref.read を AuthRepository に渡す）
-final authRepositoryProvider =
-    Provider<AuthRepository>((ref) => AuthRepository(ref.read));
+```dart
+final _instance = FirebaseAuth.instance;
 ```
 
-この部分において、``AuthRepository``に（変更する）値がなく、あくまで引数に``ref.read``をとっているだけなので値に対して同期的な処理を行なっていません。（正確には同期的な処理を行なっていますが、それはあまり考えなくて良いということです。）
+としても動作します。ものすごい恩恵があるわけではないですが、Provider にしておくことの良い点は ``ref.watch`` でのみと参照できるのでファイル内の任意の場所から呼び出すことを避けることができます。
 
-次の疑問として、なぜ``AuthRepository``の引数が``ref.read``なのかが挙げられます。なぜref.watchにしないのかというと、``AuthRepository``クラスの中身を見るとわかります。
+- 使用例3:
 
-```dart:auth_repository.dart
-class AuthRepository implements BaseAuthRepository {
-  final Reader _read;
+```dart:lib/auth_repository.dart
+final authRepositoryImplProvider = Provider<AuthRepository>(
+  (ref) => AuthRepositoryImpl(ref.watch(authProvider)),
+);
+```
 
-  const AuthRepository(this._read);
+ここでの使用目的は上の前提の(1)、(2)に当たります。使用例2の ``Provider`` を組み込んでいるのがわかると思います。
+
+:::message alert
+2023-03-24 更新内容:
+更新前の記事では ``Reader`` というクラスを用いた書き方をしていましたが、Riverpod のバージョンが2以降の場合にはこの ``Reader`` は使えないのでこの記事からは削除しました。
+:::
+
+補足として ``AuthRepositoryImpl`` は以下のようにしています。Firebase Auth を使用する処理はここにまとめています。
+
+:::details lib/repositories/auth_repository_impl.dart
+```dart
+class AuthRepositoryImpl implements AuthRepository {
+  AuthRepositoryImpl(this._auth);
+  final FirebaseAuth _auth;
 
   @override
-  Stream<User?> get authStateChanges =>
-      _read(firebaseAuthProvider).authStateChanges();
+  User? get currentUser => _auth.currentUser;
 
   @override
-  Future<void> signInWithEmail(String email, String password) async {
-    try {
-      await _read(firebaseAuthProvider)
-          .signInWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      throw convertAuthError(e.code);
-    }
+  Stream<User?> authStateChanges() => _auth.authStateChanges();
+
+  @override
+  Future<String?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    final userCredential = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    return userCredential.user?.uid;
   }
 
   @override
-  Future<UserCredential> signUp(String email, String password) async {
-    try {
-      final result =
-          await _read(firebaseAuthProvider).createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      return result;
-    } on FirebaseAuthException catch (e) {
-      throw convertAuthError(e.code);
-    }
+  Future<void> signIn({
+    required String email,
+    required String password,
+  }) async {
+    await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
   }
 
   @override
-  User? getCurrentUser() {
-    try {
-      return _read(firebaseAuthProvider).currentUser;
-    } on FirebaseAuthException catch (e) {
-      throw convertAuthError(e.code);
-    }
+  Future<void> sendPasswordResetEmail({required String email}) async {
+    await _auth.sendPasswordResetEmail(email: email);
   }
 
   @override
   Future<void> signOut() async {
-    try {
-      await _read(firebaseAuthProvider).signOut();
-    } on FirebaseAuthException catch (e) {
-      throw convertAuthError(e.code);
-    }
+    await _auth.signOut();
   }
 }
 ```
-
-それぞれ、サインイン、サインアップ、現在のユーザを取得、サインアウトを行なっています。
-``Reader``を使っているというのもありますが、``_read(firebaseAuthProvider)``のように``firebaseAuthProvider``を読み取るだけ、というのが大きな理由です。Riverpodは基本的に``ref.watch``を使用していきます。なので``ref.read``の必要があるとことは出てきたら覚えておいて、それ以外は``ref.watch``を使っていくと良いと考えます。
-
-## 補足：Reader型とは
-
-Andrea Bizzottoさんのツイートがとてもわかりやすいので貼っておきます。各RepositoryのProviderを何個も引数に取らないので非常に便利です。
-
-https://twitter.com/biz84/status/1534773316145356801?s=20&t=O9H9n1u8-UKpgmBQBnEYhQ
-
-
-ただ注意として、Readerが使えるのはRepositoryの層がデータの受け渡しをする役割である場合に限られる点です。
-``~RepositoryProvider``が``.autoDispose``付きのものだと、参照されなくなったタイミングで``~RepositoryProvider``が破棄されてしまうので要注意。
-
-
-https://riverpod.dev/ja/docs/providers/provider/
+:::
 
 ## StreamProvider
 
@@ -185,127 +202,231 @@ https://riverpod.dev/ja/docs/providers/provider/
 > - Firebase や WebSocket の監視するため。
 > - 一定時間ごとに別のプロバイダを更新するため。
 
-以上のような用途で使われます。StreamBuilderがFlutterにはあるのでいつ使うの？と疑問に思います。この``StreamBuilder``が輝けるのは以下のような場合です。
+以上のような用途で使われます。``StreamBuilder`` が Flutter に標準で用意されているため、いつ使うの？と疑問に思います。この ``StreamProvider`` が輝けるのは以下のような場合です。
 
-```dart:user_state_provider.dart
+```dart:auth_repository_impl.dart
 final userStateProvider = StreamProvider((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges;
 });
 ```
 
-```dart:auth_verification.dart
+```dart:auth_page.dart
 class AuthVerification extends HookConsumerWidget {
   const AuthVerification({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(userStateProvider);
-    return authState.when(data: (data) {
-      // ログイン済みの場合
-      if (data != null) {
-        return const MyHomePage();
+    ref.handleConnectivity();
+
+    return Scaffold(
+      body: ref.watch(authUserProvider).when(
+        data: (data) {
+          if (data != null) {
+            // data が null でない、つまりログイン済みの場合はホーム画面へ
+            return const HomePage();
+          } else {
+            // data が null のとき、つまり未ログインの場合はログイン画面へ
+            return const GetStartedPage();
+          }
+        },
+        error: (error, stackTrace) {
+          return const ErrorPage();
+        },
+        loading: () {
+          return const OverlayLoadingWidget();
+        },
+      ),
+    );
+  }
+}
+```
+
+``ref.watch(authUserProvider)`` の型は ``AsyncValue`` になっており、この ``AsyncValue`` を使うことによって、loading/error のステートを適切に処理することができるのでとても良いです。
+
+## (Async)NotifierProvider
+
+``(Async)NotifierProvider`` は ``(Async)Notifier`` クラスを継承したクラスに対して状態の監視を行うためのプロバイダです。
+
+まず、公式ドキュメント。
+
+> - あるに任意のイベントが発生した後に変更があるステートを公開するため
+> - ステートを変更するためのロジック（いわゆるビジネスロジック）を一つの場所で集中管理して保守性を高めるため。
+
+と記述してあります。今回のようにただの認証だけであれば``(Async)NotifierProvider``を使わないで行ける気がしますが、``Widget`` から ``AuthRepositoryImplProvider`` を直接呼ぶのを避けるために自分は以下のように作成しました。
+
+まず、``NotifierProvider`` の使用例は以下になります。
+
+```dart:lib/pages/login_page.dart
+final _isObscureProvider =
+    NotifierProvider.autoDispose<IsObscureNotifier, bool>(
+  IsObscureNotifier.new,
+);
+```
+
+```dart:lib/features/notifier/is_obscure_notifier.dart
+class IsObscureNotifier extends AutoDisposeNotifier<bool> {
+  @override
+  bool build() => true;
+
+  bool toUnobscured() => state = false;
+
+  bool toObscured() => state = true;
+}
+```
+
+``build()`` メソッドで初期化を行い、ステートの変更を行うような処理を関数で記述していきます。
+
+この例ではパスワードを見える状態にするか、見えない状態にするかのステートを持しています。
+
+次に、``AsyncNotifierProvider`` の使用例は以下になります。
+
+```dart:lib/features/auth/sign_in_controller.dart
+/// Firebase Auth を用いてサインインをする [AsyncNotifierProvider]。
+final signInControllerProvider =
+    AutoDisposeAsyncNotifierProvider<SignInController, void>(
+  SignInController.new,
+);
+
+class SignInController extends AutoDisposeAsyncNotifier<void> {
+  @override
+  FutureOr<void> build() {
+    // FutureOr<void> より、初期の処理の必要がないため何もしない。
+    // Do nothing since the return type is void.
+  }
+
+  /// サインインする
+  Future<void> signIn({
+    required String email,
+    required String password,
+  }) async {
+    final authRepository = ref.read(authRepositoryImplProvider);
+    // サインイン結果をローディング中にする
+    state = const AsyncLoading();
+
+    // サインイン処理を実行する
+    state = await AsyncValue.guard(() async {
+      try {
+        final isNetworkCheck = await isNetworkConnected();
+        if (!isNetworkCheck) {
+          const exception = AppException(
+            message: 'Maybe your network is disconnected. Please check yours.',
+          );
+          throw exception;
+        }
+
+        if (email.isEmpty || password.isEmpty) {
+          const exception = AppException(
+            message: 'Please input your email and password.',
+          );
+          throw exception;
+        }
+        await authRepository.signIn(
+          email: email,
+          password: password,
+        );
+      } on FirebaseAuthException catch (e) {
+        final exception = AppException(
+          code: e.code,
+          message: e.toJapanese,
+        );
+        debugPrint(e.code);
+        throw exception;
       }
-      // 未ログインの場合
-      return const SignInPage();
-    }, loading: () {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }, error: (_, __) {
-      return const Scaffold(
-        body: Center(
-          child: Text('エラーだよ'),
-        ),
-      );
     });
   }
 }
 ```
 
-このようにAsyncValueによってloading/errorのステートを適切に処理することができるのはとても良いです。
-ただ個人的な意見ですが、StreamProviderやFutureProviderを適切なタイミングで使うのは一朝一夕でできるものではなく、かなり玄人向けかなと思います。
-ですが、これが使えるとAsyncValueの点からもコードの保守性がかなり高くなると思うのでチャレンジはしてみたいです。
+``Notifier`` と同様に ``AsyncNotifier`` でも ``build()`` メソッドで初期化を行い、ステートの変更を行うような処理を関数で記述していきます。今回のように処理だけの場合は ``void`` を持たせるようにしましょう。
 
+この例ではサインイン時の処理をここでまとめています。
 
-## StateNotifierProvider
+``NotifierProvider`` との違いは名前からもわかるように非同期(async)であるかどうかです。外部との通信を行うような場合はこちらを使うようにしましょう。
 
-まず、公式ドキュメント。
+:::message
 
-> - 「イミュータブル（不変）」 なステートを公開するため（イミュータブルではあるが、イベントに応じて変わることがある）。
-> - ステートを変更するためのロジック（いわゆるビジネスロジック）を一つの場所で集中管理して保守性を高めるため。
+``AsyncValue.guard`` 自体に ``try ~ catch`` の処理があるので不要に思えるかもしれません。ただ、エラーハンドリングを細かく行いたい場合には、上のように ``AsyncValue.guard()`` の中身に ``try ~ catch`` の処理を書いて対応するようにしましょう。
+:::
 
-と記述してあります。今回のようにただの認証だけであれば``StateNotifierProvider``を使わないで行ける気がしますが、WidgetからRepositoryProviderを直接呼ぶのを避けるために自分は以下のように作成しました。
+## 補足(flutter_hooks):
 
-```dart:auth_provider.dart
-final authControllerProvider = StateNotifierProvider.autoDispose<AuthController, User?>(
-  (ref) => AuthController(ref.read),
-);
+[flutter_hooks](https://pub.dev/packages/flutter_hooks) を使った場合には今回定義した ``Provider`` や ``NotifierProvider`` はもう少し簡単に書けます。
 
-class AuthController extends StateNotifier<User?> {
-  final Reader _read;
+### pubspec.yamlの更新
 
-  AuthController(this._read) : super(null);
+```diff yaml
+environment:
+  sdk: ">=2.19.0 <3.0.0"
 
-  @override
-  User? get state => _read(authRepositoryProvider).getCurrentUser();
+dependencies:
+  flutter:
+    sdk: flutter
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  cupertino_icons: ^1.0.2
+  firebase_auth: ^4.3.0
+  firebase_core: ^2.8.0
+  hooks_riverpod: ^2.3.2
++  flutter_hooks: ^0.18.5+1
 
-  Future<void> signIn(String email, String password) async {
-    try {
-      await _read(authRepositoryProvider).signInWithEmail(email, password);
-    } catch (e) {
-      throw e.toString();
-    }
-  }
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
-  Future<void> signUp(String email, String password) async {
-    await _read(authRepositoryProvider).signUp(email, password);
-    // Firestoreにユーザデータを追加したり
-  }
-
-  Future<void> signOut() async {
-    await _read(authRepositoryProvider).signOut();
-  }
-}
+  flutter_lints: ^1.0.0
 ```
 
-強いて言うのであれば
+以下に変更点を記しておきます。基本的に使いたい ``build`` メソッド内で定義するだけです。
 
-```dart:auth_provider.dart
+### 変更例 1 (Provider)
+
+```diff dart
+- final _nameEmailTextEditingController =
+-     Provider.autoDispose<TextEditingController>(
+-   (_) => TextEditingController(),
+- );
+```
+
+```diff dart
   @override
-  User? get state => _read(authRepositoryProvider).getCurrentUser();
+  Widget build(BuildContext context, WidgetRef ref) {
++    final userNameController = useTextEditingController();
 ```
 
-は、ユーザをステートとして持たせるアプリ（ほぼそう）であればFirestore等のデータベースからUserクラスを作って、それを``StateNotifierProvider``を使ってイミュータブルに操作していく、と言うのが定石なのかなと思います。
+### 変更例 2 (NotifierProvider)
 
-## 補足:.autoDispose
+```diff dart
+- final _isObscureProvider =
+-     NotifierProvider.autoDispose<IsObscureNotifier, bool>(
+-   IsObscureNotifier.new,
+- );
 
-```dart:auth_provider.dart
-final authControllerProvider = StateNotifierProvider.autoDispose<AuthController, User?>(
-  (ref) => AuthController(ref.read),
-);
+- class IsObscureNotifier extends AutoDisposeNotifier<bool> {
+-   @override
+-   bool build() => true;
+-
+-   bool toUnobscured() => state = false;
+
+-   bool toObscured() => state = true;
+- }
 ```
 
-最後に少しだけ補足させてください。(gif作ってる時に気づいた)
+```diff dart
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
++    final isObscure = useState(true);
+```
 
-ここの部分に関して、``.autoDispose``がないとどうなるか説明します。
-test01@gmail.comというメールアドレスでログイン後、ログアウトします。その後test02@gmail.comという別のメールアドレスでログインすると画面には「test01@gmail.com」という前にログインしたアカウントのメールアドレスが表示されてしまいます。
-これは何が起こっているかというとtest01@gmail.comでログインした際にできた``StateNotifierProvider``のステートがログアウト後も残っており、このコードでは特に何もステートを変更していないので前のメールアドレスが表示されてしまうというわけです。ステートの管理には気をつけたいです。
+より詳しい使い方は以下のリポジトリを参考にしてみてください。
 
+https://github.com/Ryotaewamoto/bad-log
 
 # まとめ
 
-いかがだったでしょうか。Riverpodと少しでも仲良くなれたと思っていただけたら嬉しいです。
+いかがだったでしょうか。Riverpod と少しでも仲良くなれたと思っていただけたら嬉しいです。
 
 自分も正直まだわからない点が山ほどあるので少しずつ記事として残していこうと思います！
 
-最後まで読んでいただきありがとうございました。さらばっ！
+最後まで読んでいただきありがとうございました。
 
 # 参考文献
 - https://riverpod.dev/ja/docs/concepts/providers/
