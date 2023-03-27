@@ -6,16 +6,6 @@ topics: ["Flutter", "Dart", "Firebase"] # トピックス（タグ）["markdown"
 published: true # 公開設定（falseにすると下書き）
 ---
 
-<!-- 更新内容（2023-03-24） -->
-<!--
-- gif の削除
-- Riverpod v2 への対応
-  - NotifierProvider
-  - AsyncNotifierProvider
-  - StreamProvider
-- それに伴う Reader の項目の削除
--->
-
 :::message
 2023-03-24 更新
 :::
