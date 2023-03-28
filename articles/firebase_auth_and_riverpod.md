@@ -35,6 +35,10 @@ Riverpod と Firebase Auth を使いたい、、、けど、あんまり情報�
 
 https://github.com/Ryotaewamoto/riverpod_firebase_auth
 
+# フォルダ構成
+
+![](https://storage.googleapis.com/zenn-user-upload/24562870b10f-20230328.png)
+
 # pubspec.yamlの構成
 ```diff yaml
 environment:
