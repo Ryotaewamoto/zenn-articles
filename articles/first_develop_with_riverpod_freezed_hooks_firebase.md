@@ -96,7 +96,7 @@ void createMutablePerson() {
   // この場合Personクラスのnameとageは再代入可能なので値を変更できる
   personA.name = 'Daigo';
   personA.age++;
-  print(personA.name); // mamoru
+  print(personA.name); // Daigo
   print(personA.age); // 31
 }
 ```
@@ -131,7 +131,7 @@ class Personのひとつ前の行に@immutableというアノテーションを�
 ## Freezedの使い方
 大まかな使い方は[さくしんさん](https://zenn.dev/sakusin)の記事
 https://zenn.dev/sakusin/articles/b19e9a2c3829e0
-がかなり参考になります。公式のYoutube動画は短いのでちょっと見てみるだけでもかなり参考になると思います。
+がかなり参考になります。公式のYouTube動画は短いのでちょっと見てみるだけでもかなり参考になると思います。
 https://www.youtube.com/watch?v=RaThk0fiphA
 
 ### 参考サイト
@@ -166,11 +166,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-	flutter_hooks: ^0.18.3
+      flutter_hooks: ^0.18.3
   hooks_riverpod: ^1.0.3 // 純粋なriverpodじゃないので注意
 ```
 
 ターミナルでflutter pub getを実行
+
+```terminal
+$ flutter pub get
+```
 
 以下にサンプルとしてカウンターアプリのコードを載せておきます。
 これがHooksの基本的な使い方になります。
@@ -210,17 +214,18 @@ class CounterApp extends HookConsumerWidget {
           title: const Text('CounterApp'),
           leading: IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () => isWhiteBackGround.value = !isWhiteBackGround.value,),
+            onPressed: () => isWhiteBackGround.value = !isWhiteBackGround.value,
+          ),
         ),
         body: Center(
           child: Text(
             state.toString(),
             style: TextStyle(
-							fontSize: 40,
+              fontSize: 40,
               fontWeight: FontWeight.bold,
               color: isWhiteBackGround.value ? Colors.black : Colors.white
             ),
-            ),
+          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () => ref.read(counterProvider.notifier).increment(),
@@ -300,7 +305,7 @@ final state = ref.watch(counterProvider);
 これでCounterクラスのstateをWidgetツリーの中で使うことができます。
 
 ```dart
-body: Center(
+        body: Center(
           child: Text(
             state.toString(),// ココ！
             style: TextStyle(
@@ -308,7 +313,7 @@ body: Center(
               fontWeight: FontWeight.bold,
               color: isWhiteBackGround.value ? Colors.black : Colors.white
             ),
-            ),
+          ),
         ),
 ```
 
@@ -349,14 +354,14 @@ https://qiita.com/karamage/items/8d1352e5a4f1b079210b#riverpod-%E3%81%A8-flutter
 　├general_provider
 　└ main.dart
 
-githubのリポジトリのリンクを貼っておくので興味がある人は見てみてください。
+GitHubのリポジトリのリンクを貼っておくので興味がある人は見てみてください。
 
 https://github.com/Ryotaewamoto/riverpod_pracitce_app
 
 ここではFirebaseに絞って解説します。おそらくここが一番気になる人が多いと思うので！
 
 ## Firebase
-FirebaseについてはFirestoreとFirebaseAuthを使います。ここでは認証として「匿名」を使用しています。
+FirebaseについてはFirestoreとFirebase Authを使います。ここでは認証として「匿名」を使用しています。
 
 (追記:2022/07/09)
 メールアドレスを用いた認証に関しては別の記事で書いたのでよければ参考にしてください！
@@ -456,10 +461,10 @@ extension FirebaseFirestoreX on FirebaseFirestore {
 }
 ```
 
-extensionでまとめてしまうのは良いと思いました！
+extensionでまとめてしまうのが良いと思いました！
 
 # まとめ
-正直まだまだわからないことだらけですが、興味のあることや勉強になたことはなるべく記事にしてアウトプットしていこうと思います！
+正直まだまだわからないことだらけですが、興味のあることや勉強になったことはなるべく記事にしてアウトプットしていこうと思います！
 少しばかり長めの記事になってしまいました。今後はこれらの技術を使って実際にアプリも作っていきたいと思います！
 
 ここまで読んでくださった方本当にありがとうございます！！
